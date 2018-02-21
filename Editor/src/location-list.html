@@ -1,0 +1,23 @@
+<template>
+    <require from="value-converters"></require>
+
+    <div class="location-list">
+        <ul class="list-group">
+            <li repeat.for="location of locations | sort: 'locationCodeUpperCase':'ascending' & signal:'update-list'" class="list-group-item ${location.id === $parent.selectedId ? 'active' : ''} ${(isLocationComplete(location) ? 'location-valid' : 'location-not-valid') & signal:'update-list-location-validity'}">
+                <a click.trigger="$parent.locationClicked(location)">
+                    <div>
+                        <span class="list-text list-group-item-heading">
+                            <span class="location-code">${(location.locationCode.length > 0) ? location.locationCode : "?"}</span>
+                            <span>${(location.sceneName.length > 0) ? location.sceneName : "(Unbenannt)"}</span>
+                        </span>
+                        <!--
+                        <span style="width: 20px; float: right;">
+                            <button click.trigger="$parent.removeLocation(location)"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                        </span>
+                        -->
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+</template>

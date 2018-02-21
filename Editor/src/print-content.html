@@ -1,0 +1,25 @@
+<template>
+    <require from="qr-code-display"></require>
+
+    <div class="print-content">
+        <div class="print-title">
+            <span>${location.sceneName}</span>
+        </div>
+
+        <qr-code-display text.bind="qrCodeText"></qr-code-display>
+
+        <div class="print-game-info">
+            <span>${gameInfo.name}</span><br/>
+            Starte hier: <span>${gameInfo.startingLocation}</span>
+        </div>
+
+        <div class="print-manual">
+            Scan den Code, am besten mit <br/>
+            "Ungehörsam-Reader" (Android/iOS)
+        </div>
+
+        <div class="print-internal-info">
+            ${location.locationCode} / ${location.locationName}
+        </div>
+    </div>
+</template>

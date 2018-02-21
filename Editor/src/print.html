@@ -1,0 +1,28 @@
+<template>
+    <require from="value-converters"></require>
+    <require from="print-content"></require>
+
+    <h1>Auswahl</h1>
+    <div class="print-toolbar">
+        <button click.trigger="selectionSetAll(true)"><i class="fa fa-check" aria-hidden="true"></i> Alles</button>
+        <button click.trigger="selectionSetAll(false)"><i class="fa fa-ban" aria-hidden="true"></i> Nichts</button>
+        <button click.trigger="selectionInvert()"><i class="fa fa-exchange" aria-hidden="true"></i> Invertieren</button>
+    </div>
+    <form class="print-list">
+        <div class="checkbox" repeat.for="location of locations | sort: 'locationCodeUpperCase':'ascending'">
+            <label>
+                <input type="checkbox" checked.bind="location.printChecked">
+                <span class="location-code">${(location.locationCode.length > 0) ? location.locationCode : "?"}</span>
+                <span>${(location.sceneName.length > 0) ? location.sceneName : "(Unbenannt)"}</span>
+            </label>
+        </div>
+    </form>
+
+    <button click.trigger="print()"><i class="fa fa-print" aria-hidden="true"></i> Drucken</button>
+
+    <h1>Ungefähre Druckvorschau</h1>
+    <div class="well-preview">
+        <print-content repeat.for="location of locations | sort: 'locationCodeUpperCase':'ascending'" if.bind="location.printChecked" location.bind="location"></print-content>
+        <div class="clearfix"></div>
+    </div>
+</template>

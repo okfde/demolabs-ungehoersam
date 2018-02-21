@@ -1,0 +1,45 @@
+<template bindable="router">
+    <require from="./build-version-display"></require>
+    <require from="./save-state-display"></require>
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#skeleton-navigation-navbar-collapse">
+                <span class="sr-only">Toggle Navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <a class="navbar-brand" href="#">
+                <span>${router.title}</span>
+            </a>
+
+            <div class="navbar-show-toggled">
+                <save-state-display></save-state-display>
+            </div>
+        </div>
+
+        <div class="collapse navbar-collapse" id="skeleton-navigation-navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li repeat.for="row of router.navigation" class="${row.isActive ? 'active' : ''}">
+                    <a data-toggle="collapse" data-target="#skeleton-navigation-navbar-collapse.in" href.bind="row.href"><i class="fa ${row.settings}"></i></a>
+                </li>
+            </ul>
+
+            <build-version-display></build-version-display>
+
+            <div class="navbar-hide-toggled">
+                <save-state-display></save-state-display>
+            </div>
+
+            <!--
+            <ul class="nav navbar-nav navbar-right">
+                <li class="loader" if.bind="router.isNavigating">
+                    <i class="fa fa-spinner fa-spin fa-2x"></i>
+                </li>
+            </ul>
+            -->
+        </div>
+    </nav>
+</template>

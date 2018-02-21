@@ -1,0 +1,100 @@
+<template>
+    <require from="value-converters"></require>
+    <require from="print-button"></require>
+    <require from="horsey/dist/horsey.css"></require>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">Orts-Editor</h3>
+        </div>
+
+        <div class="panel-body">
+            <form role="form" class="form-horizontal">
+                <div class="locationform">
+                    <div class="form-group">
+                        <label for="location-code" class="col-sm-2 control-label">Kürzel</label>
+                        <div class="col-sm-10">
+                            <input type="text" value.bind="location.locationCode" input.delegate="locationCodeChanged()" class="form-control" id="location-code" placeholder="Kürzel">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location-name" class="col-sm-2 control-label">Hängt bei</label>
+                        <div class="col-sm-10">
+                            <input type="text" value.bind="location.locationName" input.delegate="locationNameChanged()" class="form-control" id="location-name" placeholder="dem realen Ort der hier eingegeben wird">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="scene-name" class="col-sm-2 control-label">Szenenname</label>
+                        <div class="col-sm-10">
+                            <input type="text" value.bind="location.sceneName" input.delegate="updateQRCodeLength()" class="form-control" id="scene-name" placeholder="Fiktiver Szenenname">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description" class="col-sm-2 control-label">Beschreibung</label>
+                        <div class="col-sm-10">
+                            <textarea value.bind="location.description" input.delegate="updateQRCodeLength()" class="form-control" id="description" placeholder="Beschreibung der Szene" rows="4"></textarea>
+                            <!--
+                            <h4>Vorschau</h4>
+                            <div class="well" innerhtml.bind="location.description | escapeHtml | markdown"></div>
+                            <div>Formatierungen: <i>*kursiv*</i>, <b>**fett**</b>, Leerzeile: Neuer Absatz.</div>
+                            -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ifthen" repeat.for="nextLocation of location.nextLocations">
+                    <div class="form-group">
+                        <label for="next-location-decision-${$index}" class="col-sm-2 control-label">Wenn du:</label>
+                        <div class="col-sm-8">
+                            <input type="text" value.bind="nextLocation.decision" input.delegate="updateQRCodeLength()" class="form-control" id="next-location-decision-${$index}" placeholder="das hier möchtest">
+                        </div>
+                        <div class="col-sm-2 ifthen-button-line ifthen-button-line-one">
+                            <button click.trigger="moveNextLocationUp($index)"><i class="fa fa-arrow-up" aria-hidden="true"></i></button>
+                            <button click.trigger="moveNextLocationDown($index)"><i class="fa fa-arrow-down" aria-hidden="true"></i></button>
+                            <button click.trigger="removeNextLocation($index)"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="next-location-location-name-${$index}" class="col-sm-2 control-label">...dann gehe zu:</label>
+                        <div class="col-sm-8">
+                            <input type="text" value.bind="nextLocation.locationName" input.delegate="updateNextLocationTarget($index)"
+                                   class="form-control ${(getNextLocationTarget($index) ? 'next-location-found' : 'next-location-not-found') & signal:'update-next-location-target'}"
+                                   id="next-location-location-name-${$index}" placeholder="diesem Ort, an dem der nächste Zettel hängt">
+                        </div>
+                        <div class="col-sm-2 ifthen-button-line">
+                            <button click.trigger="nextLocationTargetClicked($index)">
+                                <i class="fa ${(getNextLocationTarget($index) ? 'fa-arrow-right' : 'fa-plus') & signal:'update-next-location-target'}" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="addIfThen">
+                    <button click.trigger="addNextLocation()"><i class="fa fa-plus-circle" aria-hidden="true"></i> Weitere Möglichkeit</button>
+
+                    <div class="well ${qrCodeClass & signal:'update-qr-code-length'}">QR-Code-Länge: ${qrCodeLength & signal:'update-qr-code-length'} (${qrCodeAnalysis & signal:'update-qr-code-length'})</div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">Werkzeuge</h3>
+        </div>
+
+        <div class="panel-body">
+            <div class="toolbar toolbar-three-buttons">
+                <a route-href="route: location-qr-code-display; params.bind: {id:location.id}" class="toolbar-button">
+                    <button><i class="fa fa-qrcode" aria-hidden="true"></i> QR-Code anzeigen</button>
+                </a>
+                <print-button location.bind="location" label="QR-Code drucken" class="toolbar-button"></print-button>
+                <div class="toolbar-button">
+                    <button click.trigger="deleteLocation()" class="btn-danger location-editor-delete-button"><i class="fa fa-trash-o" aria-hidden="true"></i> Ort löschen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

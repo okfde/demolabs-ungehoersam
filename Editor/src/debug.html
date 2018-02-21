@@ -1,0 +1,9 @@
+<template>
+    <require from="qr-code-display"></require>
+    <require from="value-converters"></require>
+
+    <button click.trigger="createTestData()">Debug-Orte erstellen</button>
+
+    <qr-code-display text.bind="text"></qr-code-display>
+    <div innerHtml.bind="text | newlinesToBr"></div>
+</template>

@@ -1,0 +1,13 @@
+<template>
+    <form class="game-info-editor">
+        <div class="form-group">
+            <label for="name" class="control-label">Spiel-Name</label>
+            <input type="text" value.bind="gameInfo.name" class="form-control" id="name" placeholder="Spiel-Name">
+        </div>
+
+        <div class="form-group">
+            <label for="starting-location" class="control-label">Startort</label>
+            <input type="text" value.bind="gameInfo.startingLocation" class="form-control" id="starting-location" placeholder="Startort">
+        </div>
+    </form>
+</template>

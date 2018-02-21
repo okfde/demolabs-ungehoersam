@@ -1,0 +1,36 @@
+<template>
+    <require from="tools-import"></require>
+
+    <div class="tools">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Globale Operationen</h3>
+            </div>
+
+            <div class="panel-body center">
+                <button click.trigger="deleteEverything()" class="btn-danger button-delete-everything"><i class="fa fa-trash-o" aria-hidden="true"></i> Alles löschen </button>
+            </div>
+        </div>
+
+        <iframe ref="invisibleDownloadIFrame" style="display:none;"></iframe>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Export</h3>
+            </div>
+
+            <div class="panel-body center">
+                <button click.trigger="saveDataToJSON()"><i class="fa fa-floppy-o" aria-hidden="true"></i> Herunterladen</button>
+            </div>
+        </div>
+
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Import</h3>
+            </div>
+
+            <div class="panel-body center">
+                <tools-import></tools-import>
+            </div>
+        </div>
+    </div>
+</template>

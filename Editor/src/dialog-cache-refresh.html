@@ -1,0 +1,13 @@
+<template>
+    <ux-dialog>
+        <ux-dialog-body>
+            <h2>Es ist eine neue Version verfügbar!</h2>
+            Bitte aktualisiere die Seite jetzt, um die neuste Version zu bekommen.
+        </ux-dialog-body>
+
+        <ux-dialog-footer>
+            <button click.trigger="dialogController.ok()" class="btn-normal">Mache ich später selber</button>
+            <button click.trigger="refresh()" class="btn-success">Seite jetzt aktualisieren</button>
+        </ux-dialog-footer>
+    </ux-dialog>
+</template>

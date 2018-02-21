@@ -1,0 +1,13 @@
+<template>
+    <ux-dialog>
+        <ux-dialog-body>
+            <h2><i class="fa fa-question-circle-o" aria-hidden="true"></i> ${data.title}</h2>
+            ${data.content}
+        </ux-dialog-body>
+
+        <ux-dialog-footer>
+            <button click.trigger="dialogController.ok()" class.bind="data.okClass"><i class="fa ${data.okIcon}" aria-hidden="true"></i> ${data.ok}</button>
+            <button click.trigger="dialogController.cancel()" class.bind="data.cancelClass"><i class="fa ${data.cancelIcon}" aria-hidden="true"></i> ${data.cancel}</button>
+        </ux-dialog-footer>
+    </ux-dialog>
+</template>

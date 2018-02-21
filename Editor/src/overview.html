@@ -1,0 +1,14 @@
+<template>
+    <require from="./location-list"></require>
+    <require from="./game-info-editor"></require>
+    <require from="./add-location-button"></require>
+
+    <div class="row">
+        <div class="col-md-3">
+            <game-info-editor></game-info-editor>
+            <add-location-button></add-location-button>
+            <location-list></location-list>
+        </div>
+        <router-view class="col-md-9"></router-view>
+    </div>
+</template>

@@ -1,0 +1,11 @@
+<template>
+    <ux-dialog>
+        <ux-dialog-body>
+            <h2><i class="fa ${data.icon}" aria-hidden="true"></i> ${data.title}</h2>
+        </ux-dialog-body>
+
+        <ux-dialog-footer>
+            <button class="btn-normal" click.trigger="dialogController.ok()">Ok</button>
+        </ux-dialog-footer>
+    </ux-dialog>
+</template>

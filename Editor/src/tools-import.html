@@ -1,0 +1,68 @@
+<template>
+    <require from="value-converters"></require>
+
+    <input ref="importFile" type="file" change.delegate="updateFilesSelect($event)">
+    <!--<button click.trigger="saveDataToJSON()"><i class="fa fa-trash-o" aria-hidden="true"></i> In Datei exportieren</button>-->
+    <p if.bind="importError" class="alert alert-danger">${importError}</p>
+
+    <div if.bind="importData">
+
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" checked.bind="importGameInfo">
+                Spiel-Info überschreiben
+            </label>
+        </div>
+        <div class="checkbox text-danger ${importDeleteCurrentLocations ? 'bg-danger' : ''}">
+            <label>
+                <input type="checkbox" checked.bind="importDeleteCurrentLocations">
+                Aktuelle Orte löschen
+            </label>
+        </div>
+
+        <p if.bind="!importDeleteCurrentLocations">
+            Aktuelle Orte werden nicht überschrieben. Neue Orte werden angehangen.
+        </p>
+
+        <div class="tools-import-buttons">
+            <button click.trigger="clear()"><i class="fa fa-times" aria-hidden="true"></i> Abbrechen</button>
+            <button click.trigger="import()"><i class="fa fa-download" aria-hidden="true"></i> Importieren</button>
+        </div>
+
+        <h2>Spielinfo</h2>
+        <div>
+            <div>Spiel-Name: ${importData.gameInfo.name}</div>
+            <div>Startort: ${importData.gameInfo.startingLocation}</div>
+        </div>
+
+        <h2>Orte</h2>
+        <div>${importData.locations.length} Orte</div>
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div repeat.for="location of importData.locations" class="panel panel-default">
+                <div class="panel-heading" role="tab" id="heading${$index}">
+                    <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse${$index}" aria-expanded="true" aria-controls="collapse${$index}">
+                            ${(location.locationName.length > 0) ? location.locationName : "(Unbenannt)"}
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapse${$index}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading${$index}">
+                    <div class="panel-body">
+                        <h3>Beschreibung</h3>
+                        <!--<div innerHtml.bind="location.description | markdown"></div>-->
+                        <div>${location.description}</div>
+                        <h3>Ortswechsel</h3>
+                        <div>
+                            <div repeat.for="nextLocation of location.nextLocations">
+                                Wenn du
+                                <strong>${nextLocation.decision}</strong>
+                                dann gehe zu
+                                <strong>${nextLocation.locationName}</strong>.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
