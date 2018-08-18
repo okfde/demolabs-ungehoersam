@@ -2,5 +2,5 @@
  * The build version display.
  */
 export class BuildVersionDisplay {
-    buildVersion = "0.9.10";
+    buildVersion = "0.9.11";
 }
