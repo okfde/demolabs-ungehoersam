@@ -15,6 +15,16 @@ namespace UngehoersamReader
         RectTransform rectTransform;
         RawImage rawImage;
         AspectRatioFitter aspectRatioFitter;
+        
+        object refreshTracker;
+
+        /*
+        Texture2D texture;
+        Color32[] colors;
+        int width;
+        int height;
+        int lastFillColorsFrame;
+        */
 
         void Awake()
         {
@@ -45,7 +55,26 @@ namespace UngehoersamReader
 
         void LateUpdate()
         {
-            rawImage.enabled = webCam.CameraSource.RefreshView(rectTransform, rawImage, aspectRatioFitter);
+            /*
+            // Test FillColors
+            if (webCam.Ready)
+            {
+                webCam.CameraSource.FillColors(ref colors, ref width, ref height, ref lastFillColorsFrame);
+                if (texture == null)
+                {
+                    texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+                    rawImage.texture = texture;
+                }
+
+                texture.SetPixels32(colors);
+                texture.Apply();
+            }
+            */
+
+            rawImage.enabled = webCam.CameraSource.IsPlaying;
+            
+            if (rawImage.enabled)
+                webCam.CameraSource.RefreshView(rectTransform, rawImage, aspectRatioFitter, ref refreshTracker);
         }
     }
 }

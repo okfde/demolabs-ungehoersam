@@ -3153,7 +3153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraType: 1
-  natCamResolutionPreset: 0
+  natCamResolution: 3
 --- !u!4 &1130828122
 Transform:
   m_ObjectHideFlags: 0
@@ -3946,8 +3946,8 @@ MonoBehaviour:
   webCam: {fileID: 1130828121}
   tryHarder: 1
   showDebugOutput: 0
-  debugObject: {fileID: 370540639}
   debugLastDecodeTimeText: {fileID: 495645629}
+  webGLReadDelay: 0.1
 --- !u!114 &1445328964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4412,6 +4412,7 @@ MonoBehaviour:
   speechArea: {fileID: 1903748616}
   speechButtonPlay: {fileID: 1243330167}
   speechButtonStop: {fileID: 1518886510}
+  autoPlayDescription: 0
 --- !u!4 &1641428920
 Transform:
   m_ObjectHideFlags: 0
