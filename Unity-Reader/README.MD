@@ -26,5 +26,5 @@ The app is written in C#, uses [Unity 2017.3](https://store.unity.com/download) 
 ## Deactivate commerical components
 
 If you don't have NatCam and/or the Android TTS Plugin, go to *Edit->Project Settings->Player->Android->Other Settings->Configuration->Scripting Define Symbols* and...
-* Remove "`NATCAM_16;NATCAM_CORE;NATCAM_PROFESSIONAL`" if you don't have NatCam.
+* Remove "`NATCAM`" if you don't have NatCam.
 * Remove "`;TTS`" if you don't have the Android TTS Plugin.
