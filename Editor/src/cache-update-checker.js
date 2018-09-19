@@ -39,6 +39,7 @@ export class CacheUpdateChecker {
                 this.closeLoadingDialogIfOpen();
             } else {
                 appCache.addEventListener('error', this.downloadingError.bind(this), false);
+                appCache.addEventListener('cached', this.closeLoadingDialogIfOpen.bind(this), false);
             }
         });
     }
