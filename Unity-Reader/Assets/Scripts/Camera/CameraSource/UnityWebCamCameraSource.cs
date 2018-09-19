@@ -8,6 +8,27 @@ namespace UngehoersamReader
     /// </summary>
     public class UnityWebCamCameraSource : ICameraSource
     {
+        class RefreshTracker
+        {
+            float aspectRatio;
+            int videoRotationAngle;
+            bool videoVerticallyMirrored;
+
+            public void Set(float aspectRatio, int videoRotationAngle, bool videoVerticallyMirrored)
+            {
+                this.aspectRatio = aspectRatio;
+                this.videoRotationAngle = videoRotationAngle;
+                this.videoVerticallyMirrored = videoVerticallyMirrored;
+            }
+
+            public bool IsRefreshNeeded(float aspectRatio, int videoRotationAngle, bool videoVerticallyMirrored)
+            {
+                return this.aspectRatio != aspectRatio ||
+                       this.videoRotationAngle != videoRotationAngle ||
+                       this.videoVerticallyMirrored != videoVerticallyMirrored;
+            }
+        }
+
         WebCamTexture webCamTexture;
         int frameCounter;
 
@@ -22,6 +43,11 @@ namespace UngehoersamReader
         public bool Ready
         {
             get { return webCamTexture.width > 100; }
+        }
+
+        public bool IsPlaying
+        {
+            get { return webCamTexture.isPlaying; }
         }
 
         public Texture Texture
@@ -66,33 +92,53 @@ namespace UngehoersamReader
             return true;
         }
 
-        public bool RefreshView(RectTransform rectTransform, RawImage rawImage, AspectRatioFitter aspectRatioFitter)
+        public void RefreshView(RectTransform rectTransform, RawImage rawImage, AspectRatioFitter aspectRatioFitter, ref object refreshTracker)
         {
             if (!webCamTexture.isPlaying)
-                return false;
+                return;
 
-            int angleCW = webCamTexture.videoRotationAngle;
-            int angleCCW = -angleCW;
+            var aspectRatio = (float)webCamTexture.width / webCamTexture.height;
+            var videoRotationAngle = webCamTexture.videoRotationAngle;
+            var videoVerticallyMirrored = webCamTexture.videoVerticallyMirrored;
+            
+            RefreshTracker castRefreshTracker;
+            if (refreshTracker == null)
+            {
+                castRefreshTracker = new RefreshTracker();
+                refreshTracker = castRefreshTracker;
+            }
+            else
+            {
+                castRefreshTracker = (RefreshTracker) refreshTracker;
+                if (!castRefreshTracker.IsRefreshNeeded(aspectRatio, videoRotationAngle, videoVerticallyMirrored))
+                    return;
+            }
 
-            if (webCamTexture.videoVerticallyMirrored)
+            castRefreshTracker.Set(aspectRatio, videoRotationAngle, videoVerticallyMirrored);
+
+            var angleCW = videoRotationAngle;
+            var angleCCW = -angleCW;
+
+            if (videoVerticallyMirrored)
                 angleCCW += 180;
 
             rectTransform.localEulerAngles = new Vector3(0f, 0f, angleCCW);
 
-            aspectRatioFitter.aspectRatio = (float)webCamTexture.width / webCamTexture.height;
+            aspectRatioFitter.aspectRatio = aspectRatio;
 
-            rawImage.uvRect = webCamTexture.videoVerticallyMirrored
+            rawImage.uvRect = videoVerticallyMirrored
                                 ? new Rect(0, 0, 1, -1) // flip on vertical axis
                                 : new Rect(0, 0, 1, 1); // no flip
-
-            return true;
         }
+        
+        public int FrameCounter { get { return frameCounter; } }
 
-        /*
         public void SetActive(bool active)
         {
+            /*
             if (active == webCamTexture.isPlaying)
                 return;
+            */
 
             if (active)
             {
@@ -103,6 +149,5 @@ namespace UngehoersamReader
                 webCamTexture.Pause();
             }
         }
-        */
     }
 }

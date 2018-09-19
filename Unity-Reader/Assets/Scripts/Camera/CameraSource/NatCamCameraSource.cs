@@ -1,4 +1,5 @@
-﻿#if NATCAM_PROFESSIONAL
+﻿#if NATCAM
+using System.Runtime.InteropServices;
 using NatCamU.Core;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,14 +11,38 @@ namespace UngehoersamReader
     /// </summary>
     public class NatCamCameraSource : ICameraSource
     {
-        int frameCounter;
+        /*
+        class RefreshTracker
+        {
+            float aspectRatio;
 
-        public NatCamCameraSource(ResolutionPreset resolutionPreset)
+            public void Set(float aspectRatio)
+            {
+                this.aspectRatio = aspectRatio;
+            }
+            
+            public bool IsRefreshNeeded(float aspectRatio)
+            {
+                return this.aspectRatio != aspectRatio;
+            }
+        }
+        */
+        
+        object threadLock = new object();
+        int frameCounter;
+        byte[] rawFrameBytes;
+
+        public NatCamCameraSource(CameraResolution cameraResolution)
         {
             NatCam.Camera = DeviceCamera.RearCamera ?? DeviceCamera.FrontCamera;
-            NatCam.Camera.SetPreviewResolution(resolutionPreset);
-            NatCam.Camera.SetFramerate(FrameratePreset.Default);
-            NatCam.Camera.FocusMode = FocusMode.AutoFocus;
+            NatCam.Camera.PreviewResolution = cameraResolution;
+            //NatCam.Camera.Framerate = FrameratePreset.Default;
+            
+            if (!Application.isEditor) // "NatCam Error: Focus mode is not supported on legacy"
+            {
+                NatCam.Camera.FocusMode = FocusMode.AutoFocus;
+            }
+
             NatCam.Play();
 
             NatCam.OnStart += OnStart;
@@ -31,9 +56,12 @@ namespace UngehoersamReader
             NatCam.OnStart -= OnStart;
 
             Ready = true;
+            IsPlaying = true;
         }
 
         public bool Ready { get; private set; }
+    
+        public bool IsPlaying { get; private set; }
 
         public Texture Texture
         {
@@ -58,42 +86,91 @@ namespace UngehoersamReader
                 return false;
 
             lastFillColorsFrame = frameCounter;
-            return NatCam.PreviewBuffer(ref colors, out width, out height);
+            return PreviewBuffer(ref colors, out width, out height);
         }
-
-        public bool RefreshView(RectTransform rectTransform, RawImage rawImage, AspectRatioFitter aspectRatioFitter)
+        
+        bool PreviewBuffer(ref Color32[] colors, out int width, out int height)
         {
-            if (!NatCam.IsPlaying)
-                return false;
+            width = NatCam.Preview.width;
+            height = NatCam.Preview.height;
+            var pixelCount = width * height;
+            var rawFrameBytesCount = pixelCount * 4;
 
-            var size = NatCam.Camera.PreviewResolution;
+            lock (threadLock)
+            {
+                if ((rawFrameBytes == null) || (rawFrameBytes.Length != rawFrameBytesCount))
+                    rawFrameBytes = new byte[rawFrameBytesCount];
 
-#if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
-            var aspectRatio = size.y / size.x; // Other way around, because we are only doing portrait and width/height doesn't change in NatCam then.
-#else
-            var aspectRatio = size.x / size.y;
-#endif
+                if (!NatCam.CaptureFrame(rawFrameBytes))
+                    return false;
 
-            aspectRatioFitter.aspectRatio = aspectRatio;
+                if ((colors == null) || (colors.Length != pixelCount))
+                    colors = new Color32[pixelCount];
+
+                var handle = GCHandle.Alloc(colors, GCHandleType.Pinned);
+                Marshal.Copy(rawFrameBytes, 0, handle.AddrOfPinnedObject(), rawFrameBytesCount);
+                handle.Free();
+            }
+
             return true;
         }
 
-        /*
+        public void RefreshView(RectTransform rectTransform, RawImage rawImage, AspectRatioFitter aspectRatioFitter, ref object refreshTracker)
+        {
+            /*
+            // We could check this in the beginning, but I think it's better to keep those calls to a minimum.
+            if (!NatCam.IsPlaying)
+                return;
+            */
+
+            var preview = NatCam.Preview;
+            if (!preview)
+                return;
+            
+            var aspectRatio = (float) preview.width / preview.height;
+            
+            // We could use a RefreshTracker here, but it's probably faster to just assign the
+            // aspectRatio and let the property take care of not refreshing.
+            /*
+            RefreshTracker castRefreshTracker;
+            if (refreshTracker == null)
+            {
+                castRefreshTracker = new RefreshTracker();
+                refreshTracker = castRefreshTracker;
+            }
+            else
+            {
+                castRefreshTracker = (RefreshTracker) refreshTracker;
+                if (!castRefreshTracker.IsRefreshNeeded(aspectRatio))
+                    return;
+            }
+
+            castRefreshTracker.Set(aspectRatio);
+            */
+
+            aspectRatioFitter.aspectRatio = aspectRatio;
+        }
+
+        public int FrameCounter { get { return frameCounter; } }
+
         public void SetActive(bool active)
         {
+            /*
             if (active == NatCam.IsPlaying)
                 return;
+            */
 
             if (active)
             {
                 NatCam.Play();
+                IsPlaying = true;
             }
             else
             {
                 NatCam.Pause();
+                IsPlaying = false;
             }
         }
-        */
     }
 }
 #endif
